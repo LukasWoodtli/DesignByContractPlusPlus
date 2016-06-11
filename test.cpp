@@ -1,6 +1,13 @@
 
 #include <exception>
-	
+#include <iostream>
+
+#include <cassert>
+
+
+#define _DBC_STRINGIZE(x) #x
+#define _DBC_STR(x) _DBC_STRINGIZE(x)
+
 class DbcException : public std::exception {
 
 public:
@@ -8,7 +15,7 @@ public:
     
   }
 
-    virtual const char* what() const throw();
+    virtual const char* what() const throw() {return m_message;}
 	
 
      virtual ~DbcException() throw() {}
@@ -17,10 +24,12 @@ private:
   const char* m_message;
 };
 
-const char * DbcException::what() const throw() {return m_message;}
 
-void _dbc_precond_no_inv(bool cond, const char * msg) {if(!cond) {throw new DbcException(msg);}}
-#define DBC_PRECOND_NO_INV(cond) _dbc_precond_no_inv(cond, "Precondition failed " #cond " in " __FILE__);
+void _dbc_general_assert_no_inv(bool cond, const char * msg) {if(!cond) {throw  DbcException(msg);}}
+
+#define DBC_PRECOND_NO_INV(cond) _dbc_general_assert_no_inv(cond, "Precondition failed " #cond " in " __FILE__ " (" _DBC_STR(__LINE__)")");
+
+#define DBC_INV() _dbc_general_assert_no_inv(invariant(), "Invariant check failed in " __FILE__ " (" _DBC_STR(__LINE__)")");
 
 class MyClass {
 
@@ -38,10 +47,17 @@ private:
 };
 
 void testPreconditionFailing() {
+  bool exceptionCaught = false;
   MyClass c;
   c.setA(0);
-  c.precondFailingMethod();
-  
+  try {
+    c.precondFailingMethod();
+  }
+  catch(DbcException &e) {
+    std::cout << e.what();
+    exceptionCaught = true;
+  }
+  assert(exceptionCaught);
 }
 
 int main(int argn, char** argv) {
