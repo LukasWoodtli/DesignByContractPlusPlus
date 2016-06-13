@@ -1,9 +1,13 @@
 
+
 #include <exception>
+#include <stdexcept>
+	
 #include <iostream>
 
 #include <cassert>
 
+#include "gtest/gtest.h"
 
 #define _DBC_STRINGIZE(x) #x
 #define _DBC_STR(x) _DBC_STRINGIZE(x)
@@ -46,24 +50,13 @@ private:
   int m_a;
 };
 
-void testPreconditionFailing() {
+
+
+TEST(PreconditionTest, precondFail)
+{
   bool exceptionCaught = false;
   MyClass c;
   c.setA(0);
-  try {
-    c.precondFailingMethod();
-  }
-  catch(DbcException &e) {
-    std::cout << e.what();
-    exceptionCaught = true;
-  }
-  assert(exceptionCaught);
-}
-
-int main(int argn, char** argv) {
-
-    testPreconditionFailing();
-
-    return 0;
-}
+  ASSERT_THROW(c.precondFailingMethod(), DbcException);
+ }
 
