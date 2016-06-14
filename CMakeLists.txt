@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(DesignByContractPlusPlus)
 
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -fno-elide-constructors -pedantic-errors -ansi -Wextra -Wall     -Winit-self -Wold-style-cast -Woverloaded-virtual -Wuninitialized -Wmissing-declarations    -Winit-self -std=c++14")
 
 add_subdirectory(src)
 
@@ -15,8 +15,8 @@ ADD_SUBDIRECTORY (googletest)
 enable_testing()
 
 # http://stackoverflow.com/a/736838/1272072
-add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
-#add_custom_target(check COMMAND ${MAKE_CTEST_COMMAND} DEPENDS runUnitTests)
+#add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+#add_custom_target(check ${MAKE_CTEST_COMMAND} DEPENDS runUnitTests)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
