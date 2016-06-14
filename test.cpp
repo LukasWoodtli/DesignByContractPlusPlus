@@ -54,7 +54,6 @@ private:
 
 TEST(PreconditionTest, precondFail)
 {
-  bool exceptionCaught = false;
   MyClass c;
   c.setA(0);
   ASSERT_THROW(c.precondFailingMethod(), DbcException);

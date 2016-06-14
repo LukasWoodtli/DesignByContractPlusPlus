@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
-project(basic_test)
+project(DesignByContractPlusPlus)
+
+
+
+add_subdirectory(src)
 
 ################################
 # GTest
@@ -15,6 +19,7 @@ add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
 #add_custom_target(check COMMAND ${MAKE_CTEST_COMMAND} DEPENDS runUnitTests)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
 
 ################################
 # Unit Tests
