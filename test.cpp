@@ -12,13 +12,15 @@
 class MyClass {
 
 public:
+    MyClass() : m_a(0) {}
+
   void precondFailingMethod() {
     DBC_PRECOND_NO_INV(m_a == 1);
   }
 
-  void setA(int a) {m_a=a;}
-
-  int getA() const {return m_a;}
+  void precondSuccessMethod() {
+    DBC_PRECOND_NO_INV(m_a == 0);
+  }
 
 private:
   int m_a;
@@ -29,7 +31,13 @@ private:
 TEST(PreconditionTest, precondFail)
 {
   MyClass c;
-  c.setA(0);
   ASSERT_THROW(c.precondFailingMethod(), DbcException);
- }
+}
+
+TEST(PreconditionTest, precondSuccess)
+{
+    MyClass c;
+    ASSERT_NO_THROW(c.precondSuccessMethod());
+}
+
 
