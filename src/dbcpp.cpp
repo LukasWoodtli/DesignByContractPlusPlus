@@ -2,9 +2,10 @@
 
 
 
-void _dbc_general_assert_no_inv(bool cond, const char * msg)
+void _dbcpp_general_assert_no_inv(bool cond, const char * msg)
 {
     if(!cond) 
-    {throw  DbcException(msg);}
+    {throw  DbcppException(msg);}
 }
+
 
