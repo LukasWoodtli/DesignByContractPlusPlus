@@ -62,7 +62,7 @@ private:
 TEST(PostconditionTest, postcondFail)
 {
     PostcondExampleClass c;
-    ASSERT_DEATH(c.postcondFailingMethod(), "terminating with uncaught exception of type DbcppException.*");
+    ASSERT_DEATH(c.postcondFailingMethod(), "Postcond failed");
 }
 
 TEST(PostconditionTest, postcondSuccess)
