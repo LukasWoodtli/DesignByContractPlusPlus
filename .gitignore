@@ -1,4 +1,5 @@
 build/
+xcode/
 
 # Compiled Object files
 *.slo
