@@ -3,7 +3,6 @@ project(DesignByContractPlusPlus)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -fno-elide-constructors -pedantic-errors -Wextra -Wall     -Winit-self -Wold-style-cast -Woverloaded-virtual -Wuninitialized -Wmissing-declarations    -Winit-self -std=c++11")
 
-add_subdirectory(src)
 
 ################################
 # GTest
@@ -27,6 +26,6 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # Add test cpp file
 add_executable( runUnitTests test.cpp )
 # Link test executable against gtest & gtest_main
-target_link_libraries(runUnitTests gtest gtest_main dbcpp)
+target_link_libraries(runUnitTests gtest gtest_main)
 add_test( runUnitTests runUnitTests )
 
