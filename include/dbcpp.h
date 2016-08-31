@@ -10,10 +10,13 @@
 #define _DBC_STR(x) _DBC_STRINGIZE(x)
 
 
-#define _DBC_FAIL_FUNCT(msg) do{throw  DbcppException(msg);} while(0)
+#ifndef _DBC_FAIL_FUNCT
+# define _DBC_FAIL_FUNCT(msg) do{throw  DbcppException(msg);} while(0)
+#endif // _DBC_FAIL_FUNCT
 
-#define _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(cond, msg) do {if (!(cond)) {_DBC_FAIL_FUNCT(msg);} } while(0)
-
+#ifndef _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK
+# define _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(cond, msg) do {if (!(cond)) {_DBC_FAIL_FUNCT(msg);} } while(0)
+#endif // _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK
 
 
 #define DBCPP_PRECOND_NO_INV(cond) do{_DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(cond, "Precondition failed (" #cond ") in " __FILE__ " (" _DBC_STR(__LINE__)")");} while(0)
