@@ -30,3 +30,7 @@ xcode/
 *.exe
 *.out
 *.app
+
+# doxygen
+doc/
+doxygen.log

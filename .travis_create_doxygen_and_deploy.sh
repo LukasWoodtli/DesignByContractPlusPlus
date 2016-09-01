@@ -20,11 +20,12 @@ git config user.email "travis@travis-ci.org"
 rm -rf *
 echo "" > .nojekyll
 
+
 cd ..
 doxygen Doxyfile  2>&1 | tee doxygen.log
 
 cd doc
-git add -all
+git add --all
 git commit -m "Deploy code docs to GitHub Pages"
 
 git push --force "https://${GH_REPO_TOKEN}github.com/LukasWoodtli/DesignByContractPlusPlus.git" > /dev/null 2>&1

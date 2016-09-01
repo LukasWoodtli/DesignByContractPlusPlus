@@ -241,7 +241,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # that for custom extensions you also need to set FILE_PATTERNS otherwise the 
 # files are not read by doxygen.
 
-EXTENSION_MAPPING      = xdef=C++
+#EXTENSION_MAPPING      = xdef=C++
 
 # If MARKDOWN_SUPPORT is enabled (the default) then doxygen pre-processes all 
 # comments according to the Markdown format, which allows for more readable 
@@ -343,7 +343,7 @@ TYPEDEF_HIDES_STRUCT   = NO
 # 2^(16+SYMBOL_CACHE_SIZE). The valid range is 0..9, the default is 0, 
 # corresponding to a cache size of 2^16 = 65536 symbols.
 
-SYMBOL_CACHE_SIZE      = 0
+#SYMBOL_CACHE_SIZE      = 0
 
 # Similar to the SYMBOL_CACHE_SIZE the size of the symbol lookup cache can be 
 # set using LOOKUP_CACHE_SIZE. This cache is used to resolve symbols given 
@@ -667,8 +667,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = include \
-                         src
+INPUT                  = include
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -1470,13 +1469,13 @@ XML_OUTPUT             = xml
 # which can be used by a validating XML parser to check the 
 # syntax of the XML files.
 
-XML_SCHEMA             = 
+#XML_SCHEMA             = 
 
 # The XML_DTD tag can be used to specify an XML DTD, 
 # which can be used by a validating XML parser to check the 
 # syntax of the XML files.
 
-XML_DTD                = 
+#XML_DTD                = 
 
 # If the XML_PROGRAMLISTING tag is set to YES Doxygen will 
 # dump the program listings (including syntax highlighting 
