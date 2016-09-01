@@ -1,5 +1,10 @@
 ## install and addons part taken from googletest project
 
+# Blacklist
+branches:
+  except:
+    - gh-pages
+
 install:
 # /usr/bin/gcc is 4.6 always, but gcc-X.Y is available.
 - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
@@ -23,6 +28,11 @@ addons:
     - g++-4.9
     - clang-3.7
     - valgrind
+    - doxygen
+    - doxygen-doc
+    - doxygen-latex
+    - doxygen-gui
+    - graphviz
 
 language: cpp
 compiler:
@@ -32,6 +42,11 @@ os:
 - linux
 - osx
 script: bash ./.travis_build_and_test.sh
+
+# Generate and deploy documentation
+after_success:
+  - bash ./.travis_create_doxygen_and_deploy.sh
+
 env:
   global:
     secure: Voxj9sGtmzCsUJ4BoYq5KmsVuiwK/ebSRhav++tbWsJgYyJBE6rfDcpp6Ijd/xWVA/NxBHvS9JfpLLPNRo4qlqK0faMcfC2reMmUUwQBYyZLjLrz72VGUQNoGL8XqdPR7JiyP1N0XlN/ogwWokdDhx4fYTF+jLeqNg1mubKJD91QDAT5oCxCa6+Aukv02AK3+nz1drGmbJiOrLdZZrXoDL1fyLDCeGfiw7d4IVm7qlei8H2zr104xOKMxOAM1bUM47o25pjD2SgXLbwH/PUOCn1xSulO8CCe/iKUXXEfyHMwQbx39BKqfO0yZhcOGkgGc3XDYC6o6iH+KilP+EU1jM0/H+ra87hcyWbE+Q7Llt6uGhv91wsYrZUOWD8ZmEqyRh9YWGlTeqEbxFnzquURyaoAsVICn/U6TgiTqItgmC4DQlU+QmCaxcPu4/X+E3CJJLXcHvA6d/xJpLNqnOpNOkbFST+vVpT5nWTTbX/46coid38mDIEClfh2QKSZntR4eGCzOuo56/2mt9udI4GZabliYbPp881mB3nTEjlkr0+qDIBC2DTRJWrp9kydUlquYee3IU7gCuVx4fy9nUIJVZ1Ak1t5xD7ZdutzyU2hQ6ZmiN7cZmpbNTCg1ePSCiu/VhiBTiMTexYpm9F24AiVGwRZmvO5PPccvxs14VsmkLo=
