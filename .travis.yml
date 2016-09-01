@@ -45,7 +45,7 @@ script: bash ./.travis_build_and_test.sh
 
 # Generate and deploy documentation
 after_success:
-  - bash ./.travis_create_doxygen_and_deploy.sh
+  - bash -x ./.travis_create_doxygen_and_deploy.sh
 
 env:
   global:
