@@ -8,9 +8,7 @@ set -e
 mkdir doc
 cd doc
 
-git clone -b gh-pages https://github.com/LukasWoodtli/DesignByContractPlusPlus.git
-
-cd DesignByContractPlusPlus
+git clone -b gh-pages https://github.com/LukasWoodtli/DesignByContractPlusPlus.git .
 
 ##### Configure git.
 # Set the push default to simple i.e. push only the current branch.
