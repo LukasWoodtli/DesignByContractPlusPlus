@@ -1,3 +1,10 @@
+/*! \file
+**  A small library (header only) that supports Design by Contract in C++.
+**  
+** Web-page: https://github.com/LukasWoodtli/DesignByContractPlusPlus
+** License: MIT License (see LICENSE.txt)
+**
+*/
 #ifndef _DBCPP_H__
 #define _DBCPP_H__
 
