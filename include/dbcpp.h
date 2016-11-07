@@ -43,7 +43,7 @@
 
 /*! Check a postcondition and the invariants.
     Both the postcondition and the invariants are checked at the end of the function. */
-#define DBCPP_POSTCOND(cond) DBCPP_POSTCOND_NO_INV(((cond) && invariant()))
+#define DBCPP_POSTCOND(cond) auto __dbcpp_unique_post ## __LINE__ = _dbcpp_postcond("Postcond failed (" #cond ") at " __FILE__ " ("  _DBC_STR(__LINE__) ")", [&](){return (cond);}, [this]() -> bool {return invariant();})
 
 //! Check if the invariants hold
 #define DBCPP_INV() do {_DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(invariant(), "Invariant check failed in " __FILE__ " (" _DBC_STR(__LINE__)")");} while(0)
@@ -52,21 +52,21 @@
 //! Helper class that allow postcondition and invariant checks at the end of a function
 class _dbcpp_postcond {
 public:
-    _dbcpp_postcond(char const * const msg, const std::function<bool ()> & postF)
-    : m_f(postF),
+    _dbcpp_postcond(char const * const msg, const std::function<bool ()> & postF, const std::function<bool ()> & invF = [](){return true;})
+    : m_postF(postF),
+      m_invF(invF),
       m_msg(msg)
     {}
 
     ~_dbcpp_postcond() {
-        if( !std::uncaught_exception()) // only check if not a uncaught exception around
-        {
-            _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(m_f(), m_msg); // the contract check
-        }
+        _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(m_postF(), m_msg); // the contract check
+        if (!m_invF()) {_DBC_FAIL_FUNCT("Invariant check failed");};
     }
 
 private:
     //! The condition to check
-    const std::function<bool ()>  m_f;
+    const std::function<bool ()>  m_postF;
+    const std::function<bool ()>  m_invF;
     //! The message that is shown when the contract fails
     char const * const m_msg;
 };

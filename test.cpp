@@ -153,7 +153,7 @@ TEST(PostconditionTest, postcondSuccess)
 TEST(PostconditionTest, postcondSuccessInv)
 {
   PostcondExampleClass c;
-  ASSERT_DEATH(c.postcondSuccessInvFailingMethod(5), "Postcond failed");
+  ASSERT_DEATH(c.postcondSuccessInvFailingMethod(5), "Invariant check failed");
 }
 
 
