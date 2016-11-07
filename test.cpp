@@ -1,6 +1,6 @@
 
 #include "include/dbcpp.h"
-	
+
 #include <iostream>
 
 
@@ -24,11 +24,11 @@ public:
   void precondSuccessNoInvMethod(int x) {
     DBCPP_PRECOND_NO_INV(x == 5);
   }
-    
+
   void precondFailingInvOkMethod(int x) {
     DBCPP_PRECOND(x != 5);
   }
-    
+
   void precondSuccessInvFailingMethod(int x) {
     m_a = 1;
     DBCPP_PRECOND(x == 5);
@@ -38,11 +38,11 @@ public:
     m_a = 1;
     DBCPP_PRECOND(x != 5);
   }
-    
+
   void precondOkInvOkMethod(int x) {
       DBCPP_PRECOND(x == 5);
   }
-    
+
 private:
   bool invariant() const {
     return m_a == 0;
@@ -57,7 +57,7 @@ private:
 TEST(PreconditionTest, precondFail)
 {
   PrecondExampleClass c;
-  ASSERT_THROW(c.precondFailingNoInvMethod(5), DbcppException);
+  ASSERT_DEATH(c.precondFailingNoInvMethod(5), "Precondition failed");
 }
 
 TEST(PreconditionTest, precondSuccess)
@@ -69,21 +69,21 @@ TEST(PreconditionTest, precondSuccess)
 TEST(PreconditionTest, precondFailingInvOk)
 {
     PrecondExampleClass c;
-    ASSERT_THROW(c.precondFailingInvOkMethod(5), DbcppException);
+    ASSERT_DEATH(c.precondFailingInvOkMethod(5), "Precondition failed");
 }
 
 
 TEST(PreconditionTest, precondSuccessInvFailing)
 {
     PrecondExampleClass c;
-    ASSERT_THROW(c.precondSuccessInvFailingMethod(5), DbcppException);
+    ASSERT_DEATH(c.precondSuccessInvFailingMethod(5), "Invariant check failed");
 }
 
 
 TEST(PreconditionTest, precondFailingInvFailing)
 {
     PrecondExampleClass c;
-    ASSERT_THROW(c.precondFailingInvFailingMethod(5), DbcppException);
+    ASSERT_DEATH(c.precondFailingInvFailingMethod(5), "Invariant check failed");
 }
 
 TEST(PreconditionTest, precondOkInvOk)
@@ -97,23 +97,23 @@ TEST(PreconditionTest, precondOkInvOk)
 // DBCPP_PRECOND_NO_INV(cond)
 // DBCPP_PRECOND(cond)
 class PostcondExampleClass {
-    
+
 public:
     PostcondExampleClass() : m_a(0) {}
-    
+
     void postcondFailingNoInvMethod() {
         DBCPP_POSTCOND_NO_INV(m_a == 1);
-        
+
     }
-    
+
     void postcondSuccessNoInvMethod() {
         DBCPP_POSTCOND_NO_INV(m_a == 0);
     }
-    
+
     void postcondFailingInvOkMethod(int x) {
         DBCPP_POSTCOND(x != 5);
     }
-    
+
     void postcondSuccessInvFailingMethod(int x) {
       m_a = 1;
       DBCPP_POSTCOND(x == 5);
@@ -123,7 +123,7 @@ public:
       m_a = 1;
       DBCPP_POSTCOND(x != 5);
     }
-    
+
     void postcondSuccessInvOkMethod(int x) {
       DBCPP_POSTCOND(x == 5);
     }
@@ -132,7 +132,7 @@ private:
      bool invariant() const {
        return m_a == 0;
      }
-    
+
 private:
     int m_a;
 };
@@ -180,14 +180,14 @@ TEST(PostconditionTest, postcondSuccessInvOk)
 // DBCPP_INV()
 
 class InvariantExampleClass {
-    
+
 public:
     InvariantExampleClass() : m_a(0) {}
 
     void invOkMethod() {
       DBCPP_INV();
     }
-    
+
     void invFailMethod() {
       m_a = 1;
       DBCPP_INV();
@@ -211,5 +211,5 @@ TEST(InvariantTest, invOk)
 TEST(InvariantTest, invFail)
 {
     InvariantExampleClass c;
-    ASSERT_THROW(c.invFailMethod(), DbcppException);
+    ASSERT_DEATH(c.invFailMethod(),  "Invariant check failed");
 }

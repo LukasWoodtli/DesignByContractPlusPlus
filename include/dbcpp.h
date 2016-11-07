@@ -1,6 +1,6 @@
 /*! \file
 **  A small library (header only) that supports Design by Contract in C++.
-**  
+**
 ** Web-page: https://github.com/LukasWoodtli/DesignByContractPlusPlus
 ** License: MIT License (see LICENSE.txt)
 **
@@ -11,7 +11,9 @@
 #include <stdexcept>
 #include <functional> // C++ 11 needed
 
-#include  <cassert>
+#include <cstdlib>
+#include <iostream>
+
 //! Used by _DBC_STR to convert numbers to strings
 #define _DBC_STRINGIZE(x) #x
 //! Convert numbers to strings in preprocessor
@@ -20,7 +22,7 @@
 
 #ifndef _DBC_FAIL_FUNCT
 //! The general error function that is called if a contract fails
-# define _DBC_FAIL_FUNCT(msg) do{throw  DbcppException(msg);} while(0)
+# define _DBC_FAIL_FUNCT(msg) do{std::cerr << msg; abort();} while(0)
 #endif // _DBC_FAIL_FUNCT
 
 #ifndef _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK
@@ -47,21 +49,6 @@
 #define DBCPP_INV() do {_DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(invariant(), "Invariant check failed in " __FILE__ " (" _DBC_STR(__LINE__)")");} while(0)
 
 
-
-//! The exception that is thrown if a contract fails
-class DbcppException : public std::exception {
-
-public:
-  explicit DbcppException(const char* message) : m_message(message) {}
-
-    virtual const char* what() const throw() {return m_message;}
-	virtual ~DbcppException() throw() {}
-private:
-
-  const char* m_message;
-};
-
-
 //! Helper class that allow postcondition and invariant checks at the end of a function
 class _dbcpp_postcond {
 public:
@@ -69,14 +56,14 @@ public:
     : m_f(postF),
       m_msg(msg)
     {}
-    
+
     ~_dbcpp_postcond() {
         if( !std::uncaught_exception()) // only check if not a uncaught exception around
         {
             _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(m_f(), m_msg); // the contract check
         }
     }
-    
+
 private:
     //! The condition to check
     const std::function<bool ()>  m_f;
