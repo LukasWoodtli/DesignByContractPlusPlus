@@ -18,14 +18,6 @@ enable_testing()
 #add_custom_target(check ${MAKE_CTEST_COMMAND} DEPENDS runUnitTests)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include_directories(include)
 
-
-################################
-# Unit Tests
-################################
-# Add test cpp file
-add_executable( runUnitTests test.cpp )
-# Link test executable against gtest & gtest_main
-target_link_libraries(runUnitTests gtest gtest_main)
-add_test( runUnitTests runUnitTests )
-
+ADD_SUBDIRECTORY (test)
