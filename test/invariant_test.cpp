@@ -31,5 +31,5 @@ TEST(InvariantTest, invOk) {
 
 TEST(InvariantTest, invFail) {
   InvariantExampleClass c;
-  ASSERT_DEATH(c.invFailMethod(), "Invariant check failed");
+  ASSERT_DEATH(c.invFailMethod(), "Invariant check failed. Required at: ");
 }
