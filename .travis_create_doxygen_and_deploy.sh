@@ -8,8 +8,8 @@ set -e
 # Set the push default to simple i.e. push only the current branch.
 git config --global push.default simple
 # Pretend to be an user called Travis CI.
-git config user.name "Lukas Woodtli (Travis CI)"
-git config user.email "woodtli.lukas@gmail.com"
+git config  --global user.name "Lukas Woodtli (Travis CI)"
+git config  --global user.email "woodtli.lukas@gmail.com"
 
 
 mkdir doc
