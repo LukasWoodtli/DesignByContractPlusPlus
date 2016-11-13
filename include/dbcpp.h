@@ -17,29 +17,29 @@
 
 
 //! Create fail text for precondition
-inline std::ostringstream _dbc_preconditionFailText(char const * const precondExpr, char const * const file, const int line) {
+inline std::string _dbc_preconditionFailText(char const * const precondExpr, char const * const file, const int line) {
   std::ostringstream out;
   out << "Precondition failed (" << precondExpr << ") in " << file << " (" << line << ")";
-  return out;
+  return out.str();
 }
 
 //! Create fail text for postcondition
-inline std::ostringstream _dbc_postconditionFailText(char const * const postcondExpr, char const * const file, const int line) {
+inline std::string _dbc_postconditionFailText(char const * const postcondExpr, char const * const file, const int line) {
   std::ostringstream out;
   out << "Postcond failed (" << postcondExpr << ") at " << file << " (" << line << ")";
-  return out;
+  return out.str();
 }
 
 //! Create fail text for invariant
-inline std::ostringstream _dbc_invariantFailText(char const * const file, const int line) {
+inline std::string _dbc_invariantFailText(char const * const file, const int line) {
   std::ostringstream out;
   out << "Invariant check failed. Required at: " << file << " (" << line << ")";
-  return out;
+  return out.str();
 }
 
 //! The general error function that is called if a contract fails
-inline void _DBC_FAIL_FUNCT(const std::ostringstream &msg) {
-  std::cerr << msg.str();
+inline void _DBC_FAIL_FUNCT(const std::string &msg) {
+  std::cerr << msg;
   abort();
 }
 
@@ -51,7 +51,7 @@ inline void _DBC_FAIL_FUNCT(char const * const msg) {
 }
 
 //! The general function that checks if a condition holds
-inline void _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(const bool cond, const std::ostringstream& msg) {
+inline void _DBC_GENERAL_ASSERT_NO_INVARIANT_CHECK(const bool cond, const std::string msg) {
   if (!(cond)) {
     _DBC_FAIL_FUNCT(msg);
   }
