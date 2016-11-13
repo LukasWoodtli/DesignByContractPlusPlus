@@ -45,8 +45,7 @@ inline void _DBC_FAIL_FUNCT(const std::string &msg) {
 
 //! deprecated
 inline void _DBC_FAIL_FUNCT(char const * const msg) {
-  std::ostringstream out;
-  out << msg;
+  std::string out(msg);
   _DBC_FAIL_FUNCT(out);
 }
 
