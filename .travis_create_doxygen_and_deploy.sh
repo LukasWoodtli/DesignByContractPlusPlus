@@ -11,15 +11,16 @@ git config --global push.default simple
 git config  --global user.name "Lukas Woodtli (Travis CI)"
 git config  --global user.email "woodtli.lukas@gmail.com"
 
-
+pwd
 mkdir doc
-doxygen Doxyfile  2>&1 | tee doxygen.log
+doxygen Doxyfile
 
 cd doc
-echo "" > .nojekyll
+pwd
 
 git init
-git add .
+git add . --all
 git commit -m "Deploy code docs to GitHub Pages"
 
+pwd
 git push --force "https://${GH_REPO_TOKEN}@github.com/LukasWoodtli/DesignByContractPlusPlus" master:gh-pages
