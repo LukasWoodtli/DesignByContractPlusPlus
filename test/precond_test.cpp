@@ -29,7 +29,7 @@ public:
 
   void precondOkInvOkMethod(int x) { DBCPP_PRECOND(x == 5); }
 
-private:
+public:
   bool invariant() const { return m_a == 0; }
 
 private:

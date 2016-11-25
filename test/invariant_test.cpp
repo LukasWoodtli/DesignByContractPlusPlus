@@ -17,7 +17,8 @@ public:
     DBCPP_INV();
   }
 
-private:
+
+public:
   bool invariant() const { return m_a == 0; }
 
 private:

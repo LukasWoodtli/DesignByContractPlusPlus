@@ -14,28 +14,21 @@
 #include <sstream>
 
 
-
-//! Check a precondition without invariant check
-#define DBCPP_PRECOND_NO_INV(cond) \
-  DesignByContractPlusPlus::checkPreconditionWithoutInvariant(cond, #cond, __FILE__, __LINE__)
-
+#define DBCPP_PRECOND_NO_INV(cond) DBCPP_PRECOND(cond)
 //! Check a precondition and the invariants
 #define DBCPP_PRECOND(cond) \
-  DesignByContractPlusPlus::checkPrecondition([this](){return invariant();}, cond, #cond, __FILE__, __LINE__)
+  DesignByContractPlusPlus::checkPrecondition([this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);}, cond, #cond, __FILE__, __LINE__)
 
-/*! Check a postcondition without invariant check.
-    The postcondition is checked at the end of the function. */
-#define DBCPP_POSTCOND_NO_INV(cond) \
-  DesignByContractPlusPlus::PostConditionChecker __dbcpp_unique_post##__LINE__(#cond, __FILE__, __LINE__, [&](){return (cond);})
 
+#define DBCPP_POSTCOND_NO_INV(cond) DBCPP_POSTCOND(cond)
 /*! Check a postcondition and the invariants.
     Both the postcondition and the invariants are checked at the end of the function. */
 #define DBCPP_POSTCOND(cond) \
-  DesignByContractPlusPlus::PostConditionChecker __dbcpp_unique_post##__LINE__(#cond, __FILE__, __LINE__, [&](){return (cond);}, [this](){return invariant();})
+  DesignByContractPlusPlus::PostConditionChecker __dbcpp_unique_post##__LINE__(#cond, __FILE__, __LINE__, [&](){return (cond);}, [this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);})
 
 //! Check if the invariants hold
 #define DBCPP_INV() \
-  DesignByContractPlusPlus::checkInvariant(invariant(), __FILE__, __LINE__)
+  DesignByContractPlusPlus::checkInvariant(DesignByContractPlusPlus::checkInvariantIfAvailable(this), __FILE__, __LINE__)
 
 
 namespace DesignByContractPlusPlus {
@@ -147,6 +140,41 @@ namespace DesignByContractPlusPlus {
       //! The invariant to be checked
       const std::function<bool ()>  m_invF;
   };
+
+  template <typename T>
+  class HAS_INVARIANT
+  {
+      typedef char one;
+      typedef struct { char a[2];} two;
+
+      template <typename C> static one test( decltype(&C::invariant) ) ;
+      template <typename C> static two test(...);
+
+  public:
+      static constexpr bool VALUE = sizeof(test<T>(0)) == sizeof(char);
+  };
+
+  // if-then
+  template <bool Condition, typename T>
+  struct IF;
+
+  template <typename T>
+  struct IF<true, T>
+  {
+      static bool test(T const * const t) {return t->invariant();}
+  };
+  template <typename T>
+  struct IF<false, T>
+  {
+      static bool test(T const * const) {return true;}
+  };
+
+
+  template <typename T>
+  bool checkInvariantIfAvailable(T const * const t)
+  {
+      return IF<HAS_INVARIANT<T>::VALUE, T>::test(t);
+  }
 
 } // namespace DesignByContractPlusPlus
 

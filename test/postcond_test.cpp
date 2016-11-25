@@ -28,7 +28,7 @@ public:
 
   void postcondSuccessInvOkMethod(int x) { DBCPP_POSTCOND(x == 5); }
 
-private:
+public:
   bool invariant() const { return m_a == 0; }
 
 private:
