@@ -141,37 +141,46 @@ namespace DesignByContractPlusPlus {
       const std::function<bool ()>  m_invF;
   };
 
+  /*! This template class checks if a given class has a invariant method
+  **  The invariant needs to be *public* and has the signature `T::invariant() const` */
   template <typename T>
   class HAS_INVARIANT
   {
-      typedef char one;
-      typedef struct { char a[2];} two;
+      typedef char one; //!< indicates that the class T has an invariant method
+      typedef struct { char a[2];} two; //!< indicates that the class T has *not* an invariant method
 
-      template <typename C> static one test( decltype(&C::invariant) ) ;
+      //! Overload of the test function that holds for classes *with* invariant method
+      template <typename C> static one test(decltype(&C::invariant));
+      //! Overload of the test function that holds for classes *without* invariant method
       template <typename C> static two test(...);
 
   public:
+      //! Sets the value dependend of the provided class `T`
       static constexpr bool VALUE = sizeof(test<T>(0)) == sizeof(char);
   };
 
-  // if-then
+  //! Base class for compile time IF
   template <bool Condition, typename T>
   struct IF;
 
+  //! Comile time IF: *true* case
   template <typename T>
   struct IF<true, T>
   {
-      static bool test(T const * const t) {return t->invariant();}
+    //! Call the invariant method of the given class
+    inline constexpr static bool test(T const * const t) {return t->invariant();}
   };
+  //! Comile time IF: *false* case
   template <typename T>
   struct IF<false, T>
   {
-      static bool test(T const * const) {return true;}
+    //! Handle classes without invariant method as
+    inline constexpr static bool test(T const * const) {return true;}
   };
 
-
+  //! Calls the invariant method of class `T` if it is available
   template <typename T>
-  bool checkInvariantIfAvailable(T const * const t)
+  inline constexpr bool checkInvariantIfAvailable(T const * const t)
   {
       return IF<HAS_INVARIANT<T>::VALUE, T>::test(t);
   }
