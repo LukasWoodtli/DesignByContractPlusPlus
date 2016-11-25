@@ -14,13 +14,12 @@
 #include <sstream>
 
 
-#define DBCPP_PRECOND_NO_INV(cond) DBCPP_PRECOND(cond)
+
 //! Check a precondition and the invariants
 #define DBCPP_PRECOND(cond) \
   DesignByContractPlusPlus::checkPrecondition([this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);}, cond, #cond, __FILE__, __LINE__)
 
 
-#define DBCPP_POSTCOND_NO_INV(cond) DBCPP_POSTCOND(cond)
 /*! Check a postcondition and the invariants.
     Both the postcondition and the invariants are checked at the end of the function. */
 #define DBCPP_POSTCOND(cond) \

@@ -11,9 +11,9 @@ class PrecondExampleClass {
 public:
   PrecondExampleClass() : m_a(0) {}
 
-  void precondFailingNoInvMethod(int x) { DBCPP_PRECOND_NO_INV(x != 5); }
+  void precondFailingNoInvMethod(int x) { DBCPP_PRECOND(x != 5); }
 
-  void precondSuccessNoInvMethod(int x) { DBCPP_PRECOND_NO_INV(x == 5); }
+  void precondSuccessNoInvMethod(int x) { DBCPP_PRECOND(x == 5); }
 
   void precondFailingInvOkMethod(int x) { DBCPP_PRECOND(x != 5); }
 

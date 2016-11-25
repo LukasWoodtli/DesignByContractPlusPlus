@@ -3,16 +3,16 @@
 
 #include "gtest/gtest.h"
 
-// DBCPP_PRECOND_NO_INV(cond)
+
 // DBCPP_PRECOND(cond)
 class PostcondExampleClass {
 
 public:
   PostcondExampleClass() : m_a(0) {}
 
-  void postcondFailingNoInvMethod() { DBCPP_POSTCOND_NO_INV(m_a == 1); }
+  void postcondFailingNoInvMethod() { DBCPP_POSTCOND(m_a == 1); }
 
-  void postcondSuccessNoInvMethod() { DBCPP_POSTCOND_NO_INV(m_a == 0); }
+  void postcondSuccessNoInvMethod() { DBCPP_POSTCOND(m_a == 0); }
 
   void postcondFailingInvOkMethod(int x) { DBCPP_POSTCOND(x != 5); }
 
