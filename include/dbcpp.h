@@ -15,21 +15,24 @@
 
 
 
-//! Check a precondition and the invariants
+/*! Check a precondition and the invariants
+**  \param The condtion to be checked */
 #define DBCPP_PRECOND(cond) \
   DesignByContractPlusPlus::checkPrecondition([this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);}, cond, #cond, __FILE__, __LINE__)
 
 
 /*! Check a postcondition and the invariants.
-    Both the postcondition and the invariants are checked at the end of the function. */
+**  Both the postcondition and the invariants are checked at the end of the function.
+**  \param The condtion to be checked */
 #define DBCPP_POSTCOND(cond) \
   DesignByContractPlusPlus::PostConditionChecker __dbcpp_unique_post##__LINE__(#cond, __FILE__, __LINE__, [&](){return (cond);}, [this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);})
 
-//! Check if the invariants hold
+/*! Check if the invariants hold
+**  If the checked class doesn't implement an `invariant()` method nothing happens */
 #define DBCPP_INV() \
   DesignByContractPlusPlus::checkInvariant(DesignByContractPlusPlus::checkInvariantIfAvailable(this), __FILE__, __LINE__)
 
-
+/*! The methods and classes in this namespace should not be called directly */
 namespace DesignByContractPlusPlus {
 
   /***** Fail and assert ******************************************************/
@@ -167,7 +170,7 @@ namespace DesignByContractPlusPlus {
   struct IF<true, T>
   {
     //! Call the invariant method of the given class
-    inline constexpr static bool test(T const * const t) {return t->invariant();}
+    inline static bool test(T const * const t) {return t->invariant();}
   };
   //! Comile time IF: *false* case
   template <typename T>
@@ -179,7 +182,7 @@ namespace DesignByContractPlusPlus {
 
   //! Calls the invariant method of class `T` if it is available
   template <typename T>
-  inline constexpr bool checkInvariantIfAvailable(T const * const t)
+  inline bool checkInvariantIfAvailable(T const * const t)
   {
       return IF<HAS_INVARIANT<T>::VALUE, T>::test(t);
   }
