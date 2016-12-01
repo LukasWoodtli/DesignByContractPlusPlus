@@ -18,8 +18,7 @@
 /*! Check a precondition and the invariants
 **  \param The condtion to be checked */
 #define DBCPP_PRECOND(cond) \
-  DesignByContractPlusPlus::checkPrecondition([this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);}, cond, #cond, __FILE__, __LINE__)
-
+  DesignByContractPlusPlus::PreConditionChecker __dbcpp_unique_pre##__LINE__(#cond, __FILE__, __LINE__, [&](){return (cond);}, [this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);})
 
 /*! Check a postcondition and the invariants.
 **  Both the postcondition and the invariants are checked at the end of the function.
@@ -30,7 +29,7 @@
 /*! Check if the invariants hold
 **  If the checked class doesn't implement an `invariant()` method nothing happens */
 #define DBCPP_INV() \
-  DesignByContractPlusPlus::checkInvariant(DesignByContractPlusPlus::checkInvariantIfAvailable(this), __FILE__, __LINE__)
+DesignByContractPlusPlus::InvariantChecker __dbcpp_unique_inv##__LINE__(__FILE__, __LINE__, [this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);})
 
 /*! The methods and classes in this namespace should not be called directly */
 namespace DesignByContractPlusPlus {
@@ -50,65 +49,52 @@ namespace DesignByContractPlusPlus {
     }
   }
 
-  /***** Invariants ***********************************************************/
-
-  //! Create fail text for invariant
-  inline std::string invariantFailText(char const * const file, const int line) {
-    std::ostringstream out;
-    out << "Invariant check failed. Required at: " << file << " (" << line << ")";
-    return out.str();
-  }
-
-  //! Checks the invariant directly where the function is called
-  inline void checkInvariant(const bool invariant, char const * const file, int line) {
-    assertContract(invariant, invariantFailText(file, line));
-  }
+  class InvariantChecker {
+  public:
 
 
-  /***** Preconditions ********************************************************/
+      /*! Create a checker object that runs the checks when it leaves is context (function)
+      **  \param file     File where the check is declared (created by preprocessor __FILE__ directive)
+      **  \param line     Line in file where the check is declared (created by preprocessor __LINE__ directive)
+      **  \param invF     The invariant to check (implicitely `invariant()`) */
+      InvariantChecker(char const * const file, const int line, const std::function<bool ()> & invF)
+        : m_file(file),
+          m_line(line),
+          m_invF(invF)
+        {
+          assertContract(m_invF(), invariantFailText());
+        }
 
-  //! Create fail text for precondition
-  inline std::string preconditionFailText(char const * const precondExpr, char const * const file, const int line) {
-    std::ostringstream out;
-    out << "Precondition failed (" << precondExpr << ") in " << file << " (" << line << ")";
-    return out.str();
-  }
+      //! The destructor executes the provided checks
+      virtual ~InvariantChecker() {
+          assertContract(m_invF(), invariantFailText());
+      }
 
-  //! Checks the precondition directly without checking the invariant
-  inline void checkPreconditionWithoutInvariant(
-    const bool cond,
-    char const * const condText,
-    char const * const file,
-    int line) {
-      assertContract(cond,
-        preconditionFailText(condText, file, line));
-  }
+  private:
+    //! Create fail text for invariant
+    inline std::string invariantFailText() const {
+      std::ostringstream out;
+      out << "Invariant check failed. Required at: " << m_file << " (" << m_line << ")";
+      return out.str();
+    }
 
-  //! Checks the precondition and invariant directly where the function is called
-  inline void checkPrecondition(const std::function<bool ()> invariant, const bool cond, char const * const condExpr, char const * const file, const int line) {
-    DesignByContractPlusPlus::checkInvariant(invariant(), file, line);
-    DesignByContractPlusPlus::checkPreconditionWithoutInvariant(cond, condExpr, file, line);
-  }
-
-
-  /***** Postconditions *******************************************************/
-
-  /*! Create fail text for postcondition
-  **  \param postcondExpr String of the expression (created by preprocessor stringize operator '#')
-  **  \param file         File where the check is declared (created by preprocessor __FILE__ directive)
-  **  \param line         Line in file where the check is declared (created by preprocessor __LINE__ directive) */
-  inline std::string postconditionFailText(char const * const postcondExpr, char const * const file, const int line) {
-    std::ostringstream out;
-    out << "Postcond failed (" << postcondExpr << ") at " << file << " (" << line << ")";
-    return out.str();
-  }
+  protected:
+      //! The file where the check is declared
+      char const * const m_file;
+      //! The line of the file where the check is declared
+      const int m_line;
+  private:
+      //! The invariant to be checked
+      const std::function<bool ()>  m_invF;
+  };
 
 
   /*! Helper class that allow postcondition and invariant checks at the end of a function
   **  This works by postponing the conditions to be checked when the destructor
   **  of the class is called. */
-  class PostConditionChecker {
+  class PostConditionChecker : public InvariantChecker {
   public:
+
 
       /*! Create a checker object that runs the checks when it leaves is context (function)
       **  \param condExpr String of the expression (created by preprocessor stringize operator '#')
@@ -116,31 +102,69 @@ namespace DesignByContractPlusPlus {
       **  \param line     Line in file where the check is declared (created by preprocessor __LINE__ directive)
       **  \param postF    The postcondition to check (lambda)
       **  \param invF     The invariant to check (implicitely `invariant()`) */
-      PostConditionChecker(char const * const condExpr, char const * const file, const int line, const std::function<bool ()> & postF, const std::function<bool ()> & invF = [](){return true;})
-        : m_condExpr(condExpr),
-          m_file(file),
-          m_line(line),
-          m_postF(postF),
-          m_invF(invF)
+      PostConditionChecker(char const * const condExpr, char const * const file, const int line, const std::function<bool ()> & postF, const std::function<bool ()> & invF)
+        : InvariantChecker(file, line, invF),
+          m_condExpr(condExpr),
+          m_postF(postF)
         {}
 
       //! The destructor executes the provided checks
-      ~PostConditionChecker() {
-          assertContract(m_postF(), postconditionFailText(m_condExpr, m_file, m_line)); // the contract check
-          assertContract(m_invF(), invariantFailText(m_file, m_line)); // invariant check
+      virtual ~PostConditionChecker() {
+          assertContract(m_postF(), postconditionFailText());
       }
+
+  private:
+    /*! Create fail text for postcondition
+    **  \param postcondExpr String of the expression (created by preprocessor stringize operator '#')
+    **  \param file         File where the check is declared (created by preprocessor __FILE__ directive)
+    **  \param line         Line in file where the check is declared (created by preprocessor __LINE__ directive) */
+    inline std::string postconditionFailText() const {
+      std::ostringstream out;
+      out << "Postcond failed (" << m_condExpr << ") at " << m_file << " (" << m_line << ")";
+      return out.str();
+    }
 
   private:
       //! The postcondition as a string
       char const * const m_condExpr;
-      //! The file where the check is declared
-      char const * const m_file;
-      //! The line of the file where the check is declared
-      const int m_line;
       //! The postcondition to check
       const std::function<bool ()>  m_postF;
-      //! The invariant to be checked
-      const std::function<bool ()>  m_invF;
+  };
+
+
+  /*! Helper class that allow postcondition and invariant checks at the end of a function
+  **  This works by postponing the conditions to be checked when the destructor
+  **  of the class is called. */
+  class PreConditionChecker : public InvariantChecker {
+  public:
+
+
+      /*! Create a checker object that runs the checks when it leaves is context (function)
+      **  \param condExpr String of the expression (created by preprocessor stringize operator '#')
+      **  \param file     File where the check is declared (created by preprocessor __FILE__ directive)
+      **  \param line     Line in file where the check is declared (created by preprocessor __LINE__ directive)
+      **  \param postF    The postcondition to check (lambda)
+      **  \param invF     The invariant to check (implicitely `invariant()`) */
+      PreConditionChecker(char const * const condExpr, char const * const file, const int line, const std::function<bool ()> & preF, const std::function<bool ()> & invF)
+        : InvariantChecker(file, line, invF),
+          m_condExpr(condExpr),
+          m_preF(preF)
+        {
+          assertContract(m_preF(), preconditionFailText());
+        }
+
+        //! Create fail text for precondition
+        inline std::string preconditionFailText() const {
+          std::ostringstream out;
+          out << "Precondition failed (" << m_condExpr << ") in " << m_file << " (" << m_line << ")";
+          return out.str();
+        }
+
+  private:
+      //! The postcondition as a string
+      char const * const m_condExpr;
+      //! The postcondition to check
+      const std::function<bool ()>  m_preF;
   };
 
   /*! This template class checks if a given class has a invariant method
