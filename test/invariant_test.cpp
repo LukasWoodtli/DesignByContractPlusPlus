@@ -34,3 +34,17 @@ TEST(InvariantTest, invFail) {
   InvariantExampleClass c;
   ASSERT_DEATH(c.invFailMethod(), "Invariant check failed. Required at: ");
 }
+
+
+class InvariantExampleClassWithoutInvariantMethod {
+
+public:
+  InvariantExampleClassWithoutInvariantMethod() {}
+
+  void invOkMethod() { DBCPP_INV(); }
+};
+
+TEST(InvariantTest, noInvMethod) {
+  InvariantExampleClassWithoutInvariantMethod c;
+  ASSERT_NO_THROW(c.invOkMethod());
+}

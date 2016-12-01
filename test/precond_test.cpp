@@ -65,3 +65,64 @@ TEST(PreconditionTest, precondOkInvOk) {
   PrecondExampleClass c;
   ASSERT_NO_THROW(c.precondOkInvOkMethod(5));
 }
+
+
+
+
+
+class PrecondExampleClassWithoutInvariantMethod {
+
+public:
+  PrecondExampleClassWithoutInvariantMethod() : m_a(0) {}
+
+  void precondFailingNoInvMethod(int x) { DBCPP_PRECOND(x != 5); }
+
+  void precondSuccessNoInvMethod(int x) { DBCPP_PRECOND(x == 5); }
+
+  void precondFailingInvOkMethod(int x) { DBCPP_PRECOND(x != 5); }
+
+  void precondSuccessInvFailingMethod(int x) {
+    m_a = 1;
+    DBCPP_PRECOND(x == 5);
+  }
+
+  void precondFailingInvFailingMethod(int x) {
+    m_a = 1;
+    DBCPP_PRECOND(x != 5);
+  }
+
+  void precondOkInvOkMethod(int x) { DBCPP_PRECOND(x == 5); }
+
+private:
+  int m_a;
+};
+
+TEST(PreconditionTest, precondFailWithoutInvariantMethod) {
+  PrecondExampleClassWithoutInvariantMethod c;
+  ASSERT_DEATH(c.precondFailingNoInvMethod(5), "Precondition failed");
+}
+
+TEST(PreconditionTest, precondSuccessWithoutInvariantMethod) {
+  PrecondExampleClassWithoutInvariantMethod c;
+  ASSERT_NO_THROW(c.precondSuccessNoInvMethod(5));
+}
+
+TEST(PreconditionTest, precondFailingInvOkWithoutInvariantMethod) {
+  PrecondExampleClassWithoutInvariantMethod c;
+  ASSERT_DEATH(c.precondFailingInvOkMethod(5), "Precondition failed");
+}
+
+TEST(PreconditionTest, precondSuccessInvNotAvailableWithoutInvariantMethod) {
+  PrecondExampleClassWithoutInvariantMethod c;
+  ASSERT_NO_THROW(c.precondSuccessInvFailingMethod(5));
+}
+
+TEST(PreconditionTest, precondFailingInvNotAvailableWithoutInvariantMethod) {
+  PrecondExampleClassWithoutInvariantMethod c;
+  ASSERT_DEATH(c.precondFailingInvFailingMethod(5), "Precondition failed");
+}
+
+TEST(PreconditionTest, precondOkInvOkWithoutInvariantMethod) {
+  PrecondExampleClassWithoutInvariantMethod c;
+  ASSERT_NO_THROW(c.precondOkInvOkMethod(5));
+}
