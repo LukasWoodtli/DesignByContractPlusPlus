@@ -14,7 +14,6 @@
 #include <sstream>
 
 
-
 /*! Check a precondition and the invariants
 **  \param The condtion to be checked */
 #define DBCPP_PRECOND(cond) \
@@ -34,21 +33,6 @@ DesignByContractPlusPlus::InvariantChecker __dbcpp_unique_inv##__LINE__(__FILE__
 /*! The methods and classes in this namespace should not be called directly */
 namespace DesignByContractPlusPlus {
 
-  /***** Fail and assert ******************************************************/
-
-  //! The general error function that is called if a contract fails
-  inline void fail(const std::string &msg) {
-    std::cerr << msg;
-    abort();
-  }
-
-  //! The general function that checks if a condition holds
-  inline void assertContract(const bool cond, const std::string msg) {
-    if (!(cond)) {
-      fail(msg);
-    }
-  }
-
   class InvariantChecker {
   public:
 
@@ -62,12 +46,12 @@ namespace DesignByContractPlusPlus {
           m_line(line),
           m_invF(invF)
         {
-          assertContract(m_invF(), invariantFailText());
+          assertContract(m_invF(), invariantFailText(), invariantTraceText());
         }
 
       //! The destructor executes the provided checks
       virtual ~InvariantChecker() {
-          assertContract(m_invF(), invariantFailText());
+          assertContract(m_invF(), invariantFailText(), invariantTraceText());
       }
 
   protected:
@@ -78,12 +62,37 @@ namespace DesignByContractPlusPlus {
       return out.str();
     }
 
+    //! The general error function that is called if a contract fails
+    inline static void fail(const std::string &msg) {
+      std::cerr << msg;
+      abort();
+    }
+
+    //! The general function that checks if a condition holds
+    inline static void assertContract(const bool cond, const std::string msg, const std::string traceText) {
+      if (!traceText.empty()) { std::cout << traceText << "\n"; }
+      if (!(cond)) {
+        fail(msg);
+      }
+    }
+
   private:
     //! Create fail text for invariant
     inline std::string invariantFailText() const {
       std::ostringstream out;
       out << "Invariant check failed. Required at: " << m_file << " (" << m_line << ")";
       return out.str();
+    }
+
+    //! Create fail text for invariant
+    inline std::string invariantTraceText() const {
+      #ifdef _DBCPP_TRACE_ACTIVE
+      std::ostringstream out;
+      out << "Checking Invariant. Required at: " << m_file << " (" << m_line << ")";
+      return out.str();
+      #else /* _DBCPP_TRACE_ACTIVE */
+      return "";
+      #endif /* _DBCPP_TRACE_ACTIVE */
     }
 
   private:
@@ -113,7 +122,7 @@ namespace DesignByContractPlusPlus {
           m_condExpr(condExpr),
           m_preF(preF)
         {
-          assertContract(m_preF(), preconditionFailText());
+          assertContract(m_preF(), preconditionFailText(), preconditionTraceText());
         }
 
   private:
@@ -122,6 +131,16 @@ namespace DesignByContractPlusPlus {
         std::ostringstream out;
         out << "Precondition failed (" << m_condExpr << ") in " << failPositionText();
         return out.str();
+      }
+
+      inline std::string preconditionTraceText() const {
+        #if _DBCPP_TRACE_ACTIVE
+        std::ostringstream out;
+        out << "Checking Precondition (" << m_condExpr << ") in " << failPositionText();
+        return out.str();
+        #else /* _DBCPP_TRACE_ACTIVE */
+        return "";
+        #endif /* _DBCPP_TRACE_ACTIVE */
       }
 
   private:
@@ -152,7 +171,7 @@ namespace DesignByContractPlusPlus {
 
         //! The destructor executes the provided checks
         virtual ~PostConditionChecker() {
-            assertContract(m_postF(), postconditionFailText());
+            assertContract(m_postF(), postconditionFailText(), postconditionTraceText());
         }
 
     private:
@@ -164,6 +183,16 @@ namespace DesignByContractPlusPlus {
         std::ostringstream out;
         out << "Postcond failed (" << m_condExpr << ") at " << failPositionText();
         return out.str();
+      }
+
+      inline std::string postconditionTraceText() const {
+        #if _DBCPP_TRACE_ACTIVE
+        std::ostringstream out;
+        out << "Checking Postcond (" << m_condExpr << ") at " << failPositionText();
+        return out.str();
+        #else /* _DBCPP_TRACE_ACTIVE */
+        return "";
+        #endif /* _DBCPP_TRACE_ACTIVE */
       }
 
     private:
