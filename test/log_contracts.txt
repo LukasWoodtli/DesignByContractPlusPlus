@@ -1,0 +1,20 @@
+
+Create test: WithoutInvariantFunction
+
+Run test: WithoutInvariantFunction::precondSuccessPostcondSuccess
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:24
+Tracing: Checking Precondition (a == 1) in /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:24
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:25
+Tracing: Checking Postcond (b == 2) at /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:25
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:25
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:24
+
+Run test: WithoutInvariantFunction::precondFailPostcondSuccess
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:32
+Tracing: Checking Precondition (a == 1) in /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:32
+Fail called! Message: Precondition failed (a == 1) in /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:32
+
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:33
+Tracing: Checking Postcond (a == 2) at /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:33
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:33
+Tracing: Checking Invariant. Required at: /Users/luki/Development/DesignByContractPlusPlus/test/trace_test.cpp:32

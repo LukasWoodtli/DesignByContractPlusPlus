@@ -41,6 +41,7 @@ DesignByContractPlusPlus::InvariantChecker __dbcpp_unique_inv##__LINE__(__FILE__
 /*! The methods and classes in this namespace should not be called directly */
 namespace DesignByContractPlusPlus {
 
+
   class InvariantChecker {
   public:
 
@@ -62,6 +63,10 @@ namespace DesignByContractPlusPlus {
           assertContract(m_invF(), invariantFailText(), invariantTraceText());
       }
 
+      static void setFailFunction(std::function<void (const std::string&)> fn) {
+        sh.m_failFunction = fn;
+      }
+
   protected:
     //! Create text for identifying position in source file
     inline std::string failPositionText() const {
@@ -70,17 +75,19 @@ namespace DesignByContractPlusPlus {
       return out.str();
     }
 
-    //! The general error function that is called if a contract fails
-    inline static void fail(const std::string &msg) {
+    /*! The general error function that is called if a contract fails
+        \todo this function can be customized */
+    inline static void defaultFailFunction(const std::string &msg) {
       std::cerr << msg;
       abort();
     }
 
     //! The general function that checks if a condition holds
     inline static void assertContract(const bool cond, const std::string msg, const std::string traceText) {
+      (void)traceText;
       _DBCPP_TRACE_FUNCTION(traceText);
       if (!(cond)) {
-        fail(msg);
+        sh.m_failFunction(msg);
       }
     }
 
@@ -88,7 +95,7 @@ namespace DesignByContractPlusPlus {
     //! Create fail text for invariant
     inline std::string invariantFailText() const {
       std::ostringstream out;
-      out << "Invariant check failed. Required at: " << m_file << " (" << m_line << ")\n";
+      out << "Invariant check failed. Required at: " << m_file << ":" << m_line << "\n";
       return out.str();
     }
 
@@ -96,7 +103,7 @@ namespace DesignByContractPlusPlus {
     inline std::string invariantTraceText() const {
       #ifdef _DBCPP_TRACE_FUNCTION
       std::ostringstream out;
-      out << "Checking Invariant. Required at: " << m_file << " (" << m_line << ")\n";
+      out << "Checking Invariant. Required at: " << m_file << ":" << m_line << "\n";
       return out.str();
       #else /* _DBCPP_TRACE_FUNCTION */
       return "";
@@ -110,7 +117,18 @@ namespace DesignByContractPlusPlus {
       const int m_line;
       //! The invariant to be checked
       const std::function<bool ()>  m_invF;
+
+      // from http://stackoverflow.com/a/11709860/1272072
+      template <typename T>
+      struct static_holder
+      {
+        static std::function<void (const std::string&)> m_failFunction;
+      };
+      static static_holder<bool> sh;
   };
+  template <typename T>
+  std::function<void (const std::string&)> InvariantChecker::static_holder<T>::m_failFunction = [](const std::string& msg){InvariantChecker::defaultFailFunction(msg);};
+
 
   /*! Helper class that allow postcondition and invariant checks at the end of a function
   **  This works by postponing the conditions to be checked when the destructor
