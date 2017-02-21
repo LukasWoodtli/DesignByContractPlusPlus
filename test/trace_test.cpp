@@ -33,6 +33,7 @@ public:
     DBCPP_POSTCOND(a == 2);
     m_var = false;
     b = 2;
+    (void)b;
   }
 
 private:
@@ -44,7 +45,7 @@ private:
 
 int main() {
   std::cout << "Start trace_test" << "\n";
-    DesignByContractPlusPlus::InvariantChecker::setFailFunction(
+    DesignByContractPlusPlus::setFailFunction(
       [](const std::string& msg) {
         mod_logFile << "Fail called! Message: " << msg << "\n";
       });

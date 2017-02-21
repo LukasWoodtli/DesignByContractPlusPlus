@@ -40,11 +40,13 @@ DesignByContractPlusPlus::InvariantChecker __dbcpp_unique_inv##__LINE__(__FILE__
 
 /*! The methods and classes in this namespace should not be called directly */
 namespace DesignByContractPlusPlus {
-
+  
+  void setFailFunction(std::function<void (const std::string&)> fn); 
 
   class InvariantChecker {
-  public:
+    friend void setFailFunction(std::function<void (const std::string&)> fn); 
 
+    public:
 
       /*! Create a checker object that runs the checks when it leaves is context (function)
       **  \param file     File where the check is declared (created by preprocessor __FILE__ directive)
@@ -59,12 +61,8 @@ namespace DesignByContractPlusPlus {
         }
 
       //! The destructor executes the provided checks
-      virtual ~InvariantChecker() {
+      ~InvariantChecker() {
           assertContract(m_invF(), invariantFailText(), invariantTraceText());
-      }
-
-      static void setFailFunction(std::function<void (const std::string&)> fn) {
-        sh.m_failFunction = fn;
       }
 
   protected:
@@ -75,19 +73,12 @@ namespace DesignByContractPlusPlus {
       return out.str();
     }
 
-    /*! The general error function that is called if a contract fails
-        \todo this function can be customized */
-    inline static void defaultFailFunction(const std::string &msg) {
-      std::cerr << msg;
-      abort();
-    }
-
     //! The general function that checks if a condition holds
     inline static void assertContract(const bool cond, const std::string msg, const std::string traceText) {
       (void)traceText;
       _DBCPP_TRACE_FUNCTION(traceText);
       if (!(cond)) {
-        sh.m_failFunction(msg);
+        s_failFunctionHelper.s_failFunction(msg);
       }
     }
 
@@ -120,14 +111,24 @@ namespace DesignByContractPlusPlus {
 
       // from http://stackoverflow.com/a/11709860/1272072
       template <typename T>
-      struct static_holder
+      struct staticFailFunctionHelper
       {
-        static std::function<void (const std::string&)> m_failFunction;
+        static std::function<void (const std::string&)> s_failFunction;
       };
-      static static_holder<bool> sh;
+      static staticFailFunctionHelper<bool> s_failFunctionHelper;
   };
+
+  /*! The general error function that is called if a contract fails
+     \todo this function can be customized */
   template <typename T>
-  std::function<void (const std::string&)> InvariantChecker::static_holder<T>::m_failFunction = [](const std::string& msg){InvariantChecker::defaultFailFunction(msg);};
+  std::function<void (const std::string&)> InvariantChecker::staticFailFunctionHelper<T>::s_failFunction = [](const std::string& msg){
+      std::cerr << msg;
+      abort();};
+
+  inline void setFailFunction(std::function<void (const std::string&)> fn) {
+    InvariantChecker::s_failFunctionHelper.s_failFunction = fn;
+  }
+
 
 
   /*! Helper class that allow postcondition and invariant checks at the end of a function
@@ -196,7 +197,7 @@ namespace DesignByContractPlusPlus {
           {}
 
         //! The destructor executes the provided checks
-        virtual ~PostConditionChecker() {
+        ~PostConditionChecker() {
             assertContract(m_postF(), postconditionFailText(), postconditionTraceText());
         }
 
