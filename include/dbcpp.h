@@ -31,20 +31,15 @@
 DesignByContractPlusPlus::InvariantChecker __dbcpp_unique_inv##__LINE__(__FILE__, __LINE__, [this](){return DesignByContractPlusPlus::checkInvariantIfAvailable(this);})
 
 
-/*! \def _DBCPP_TRACE_FUNCTION(str) Defines the function where trace outputs are written.
-**  \a str is sopposed to be a std::string. */
-#ifndef _DBCPP_TRACE_FUNCTION
-# define _DBCPP_TRACE_FUNCTION(str) do{(void)str;}while(0)
-#endif /* _DBCPP_TRACE_FUNCTION */
-
-
 /*! The methods and classes in this namespace should not be called directly */
 namespace DesignByContractPlusPlus {
   
   void setFailFunction(std::function<void (const std::string&)> fn); 
+  void setTraceFunction(std::function<void (const std::string&)> fn);
 
   class InvariantChecker {
     friend void setFailFunction(std::function<void (const std::string&)> fn); 
+    friend void setTraceFunction(std::function<void (const std::string&)> fn);
 
     public:
 
@@ -75,8 +70,7 @@ namespace DesignByContractPlusPlus {
 
     //! The general function that checks if a condition holds
     inline static void assertContract(const bool cond, const std::string msg, const std::string traceText) {
-      (void)traceText;
-      _DBCPP_TRACE_FUNCTION(traceText);
+      s_traceFunctionHelper.s_traceFunction(traceText);
       if (!(cond)) {
         s_failFunctionHelper.s_failFunction(msg);
       }
@@ -92,13 +86,9 @@ namespace DesignByContractPlusPlus {
 
     //! Create fail text for invariant
     inline std::string invariantTraceText() const {
-      #ifdef _DBCPP_TRACE_FUNCTION
       std::ostringstream out;
       out << "Checking Invariant. Required at: " << m_file << ":" << m_line << "\n";
       return out.str();
-      #else /* _DBCPP_TRACE_FUNCTION */
-      return "";
-      #endif /* _DBCPP_TRACE_FUNCTION */
     }
 
   private:
@@ -116,6 +106,13 @@ namespace DesignByContractPlusPlus {
         static std::function<void (const std::string&)> s_failFunction;
       };
       static staticFailFunctionHelper<bool> s_failFunctionHelper;
+     
+      template <typename T>
+      struct staticTraceFunctionHelper
+      {
+        static std::function<void (const std::string&)> s_traceFunction;
+      };
+      static staticTraceFunctionHelper<bool> s_traceFunctionHelper;
   };
 
   /*! The general error function that is called if a contract fails
@@ -124,9 +121,15 @@ namespace DesignByContractPlusPlus {
   std::function<void (const std::string&)> InvariantChecker::staticFailFunctionHelper<T>::s_failFunction = [](const std::string& msg){
       std::cerr << msg;
       abort();};
+  template <typename T>
+  std::function<void (const std::string&)> InvariantChecker::staticTraceFunctionHelper<T>::s_traceFunction = [](const std::string&){};
 
   inline void setFailFunction(std::function<void (const std::string&)> fn) {
     InvariantChecker::s_failFunctionHelper.s_failFunction = fn;
+  }
+
+  inline void setTraceFunction(std::function<void (const std::string&)> fn) {
+     InvariantChecker::s_traceFunctionHelper.s_traceFunction = fn;
   }
 
 
@@ -161,13 +164,9 @@ namespace DesignByContractPlusPlus {
       }
 
       inline std::string preconditionTraceText() const {
-        #ifdef _DBCPP_TRACE_FUNCTION
         std::ostringstream out;
         out << "Checking Precondition (" << m_condExpr << ") in " << failPositionText() << "\n";
         return out.str();
-        #else /* _DBCPP_TRACE_FUNCTION */
-        return "";
-        #endif /* _DBCPP_TRACE_FUNCTION */
       }
 
   private:
@@ -213,13 +212,9 @@ namespace DesignByContractPlusPlus {
       }
 
       inline std::string postconditionTraceText() const {
-        #ifdef _DBCPP_TRACE_FUNCTION
         std::ostringstream out;
         out << "Checking Postcond (" << m_condExpr << ") at " << failPositionText() << "\n";
         return out.str();
-        #else /* _DBCPP_TRACE_FUNCTION */
-        return "";
-        #endif /* _DBCPP_TRACE_FUNCTION */
       }
 
     private:

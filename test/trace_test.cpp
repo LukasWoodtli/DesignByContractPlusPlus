@@ -3,8 +3,6 @@
 #include <fstream>
 
 
-static void traceFunction(std::string str);
-#define _DBCPP_TRACE_FUNCTION(str) traceFunction(str)
 #include "dbcpp.h"
 
 static std::ofstream mod_logFile;
@@ -50,6 +48,8 @@ int main() {
         mod_logFile << "Fail called! Message: " << msg << "\n";
       });
 
+    DesignByContractPlusPlus::setTraceFunction(&traceFunction);
+    
     mod_logFile.open ("log_contracts.txt");
 
 
