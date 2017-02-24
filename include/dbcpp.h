@@ -70,9 +70,9 @@ namespace DesignByContractPlusPlus {
 
     //! The general function that checks if a condition holds
     inline static void assertContract(const bool cond, const std::string msg, const std::string traceText) {
-      s_traceFunctionHelper.s_traceFunction(traceText);
+      s_staticFunctionHelper.s_traceFunction(traceText);
       if (!(cond)) {
-        s_failFunctionHelper.s_failFunction(msg);
+        s_staticFunctionHelper.s_failFunction(msg);
       }
     }
 
@@ -101,35 +101,30 @@ namespace DesignByContractPlusPlus {
 
       // from http://stackoverflow.com/a/11709860/1272072
       template <typename T>
-      struct staticFailFunctionHelper
+      struct staticFunctionHelper
       {
         static std::function<void (const std::string&)> s_failFunction;
-      };
-      static staticFailFunctionHelper<bool> s_failFunctionHelper;
-     
-      template <typename T>
-      struct staticTraceFunctionHelper
-      {
         static std::function<void (const std::string&)> s_traceFunction;
       };
-      static staticTraceFunctionHelper<bool> s_traceFunctionHelper;
+      static staticFunctionHelper<bool> s_staticFunctionHelper;
+
   };
 
   /*! The general error function that is called if a contract fails
      \todo this function can be customized */
   template <typename T>
-  std::function<void (const std::string&)> InvariantChecker::staticFailFunctionHelper<T>::s_failFunction = [](const std::string& msg){
+  std::function<void (const std::string&)> InvariantChecker::staticFunctionHelper<T>::s_failFunction = [](const std::string& msg){
       std::cerr << msg;
       abort();};
   template <typename T>
-  std::function<void (const std::string&)> InvariantChecker::staticTraceFunctionHelper<T>::s_traceFunction = [](const std::string&){};
+  std::function<void (const std::string&)> InvariantChecker::staticFunctionHelper<T>::s_traceFunction = [](const std::string&){};
 
   inline void setFailFunction(std::function<void (const std::string&)> fn) {
-    InvariantChecker::s_failFunctionHelper.s_failFunction = fn;
+    InvariantChecker::s_staticFunctionHelper.s_failFunction = fn;
   }
 
   inline void setTraceFunction(std::function<void (const std::string&)> fn) {
-     InvariantChecker::s_traceFunctionHelper.s_traceFunction = fn;
+     InvariantChecker::s_staticFunctionHelper.s_traceFunction = fn;
   }
 
 
